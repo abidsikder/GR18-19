@@ -14,19 +14,20 @@ public class HybridRobotTeleOp extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     // initialize new instance of the robot by binding the motors
-    private HybridRobot robot = new HybridRobot(
-            hardwareMap.get(DcMotor.class, "topLeft"),
-            hardwareMap.get(DcMotor.class, "topRight"),
-            hardwareMap.get(DcMotor.class, "bottomLeft"),
-            hardwareMap.get(DcMotor.class, "bottomRight")
-    );
+    private HybridRobot robot;
 
     private Gamepad driver = gamepad1;
-    private Gamepad gunner = gamepad2;
+//    private Gamepad gunner = gamepad2;
 
     @Override
     public void runOpMode() throws InterruptedException
     {
+        robot = new HybridRobot(
+            hardwareMap.get(DcMotor.class, "TL"),
+            hardwareMap.get(DcMotor.class, "TR"),
+            hardwareMap.get(DcMotor.class, "BL"),
+            hardwareMap.get(DcMotor.class, "BR")
+    );
         if (robot != null)
         {
             telemetry.addData("Status", "Initialized");
