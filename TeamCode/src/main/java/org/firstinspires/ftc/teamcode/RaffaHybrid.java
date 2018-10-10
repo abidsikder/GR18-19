@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -56,6 +57,9 @@ public class RaffaHybrid extends LinearOpMode {
     private DcMotor frontRight = null;
     private DcMotor backLeft = null;
     private DcMotor backRight = null;
+    private DcMotor horizontalSpool = null;
+    private DcMotor verticalSpool = null;
+    private Servo liftServo = null;
 
     @Override
     public void runOpMode() {
@@ -69,6 +73,9 @@ public class RaffaHybrid extends LinearOpMode {
         frontRight = hardwareMap.get(DcMotor.class, "TR");
         backLeft = hardwareMap.get(DcMotor.class, "BL");
         backRight = hardwareMap.get(DcMotor.class, "BR");
+        horizontalSpool = hardwareMap.get(DcMotor.class, "HS");
+        verticalSpool = hardwareMap.get(DcMotor.class, "VS");
+        liftServo = hardwareMap.get(Servo.class, "LS");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -82,6 +89,8 @@ public class RaffaHybrid extends LinearOpMode {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        horizontalSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        verticalSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -93,6 +102,8 @@ public class RaffaHybrid extends LinearOpMode {
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
             double rightPower;
+            double horizontalPower;
+            double verticalPower;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
@@ -103,6 +114,8 @@ public class RaffaHybrid extends LinearOpMode {
             double turn  =  gamepad1.right_stick_x;
             leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+            horizontalPower   = Range.clip(-gamepad2.left_stick_y, -1.0, 1.0) ;
+            verticalPower   = Range.clip(-gamepad2.right_stick_y, -1.0, 1.0) ;
 
             // Apply threshold to motor powers so that they don't stall. If power is below threshold, don't run motor at all.
             if (!(leftPower > DC_MOTOR_THRESHOLD || leftPower < -DC_MOTOR_THRESHOLD)) {
@@ -110,6 +123,12 @@ public class RaffaHybrid extends LinearOpMode {
             }
             if (!(rightPower > DC_MOTOR_THRESHOLD || rightPower < -DC_MOTOR_THRESHOLD)) {
                 rightPower = 0;
+            }
+            if (!(horizontalPower > DC_MOTOR_THRESHOLD || horizontalPower < -DC_MOTOR_THRESHOLD)) {
+                horizontalPower = 0;
+            }
+            if (!(verticalPower > DC_MOTOR_THRESHOLD || verticalPower < -DC_MOTOR_THRESHOLD)) {
+                verticalPower = 0;
             }
 
             // Tank Mode uses one stick to control each wheel.
@@ -122,6 +141,15 @@ public class RaffaHybrid extends LinearOpMode {
             frontRight.setPower(rightPower);
             backLeft.setPower(leftPower);
             backRight.setPower(rightPower);
+            horizontalSpool.setPower(horizontalPower);
+            verticalSpool.setPower(verticalPower);
+
+            // Need to figure out servo positions.
+//            if (gamepad2.left_bumper) {
+//                liftServo.setPosition(DOWN POSITION???)
+//            } else if (gamepad2.right_bumper) {
+//                liftServo.setPosition(UP POSITION???)
+//            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
