@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -41,6 +42,8 @@ import com.qualcomm.robotcore.util.Range;
  * Basic TeleOp for Hybrid robot.
  * Based on BasicOpMode_Linear.
  * September 24, 2018.
+ *
+ * Right and left are from the robot's perspective
  */
 
 @TeleOp(name="RaffaHybrid", group="Linear Opmode")
@@ -50,6 +53,11 @@ public class RaffaHybrid extends LinearOpMode {
      * Power threshold for motors
      */
     private static final double DC_MOTOR_THRESHOLD = 0.5;
+    private static final double NOM_LOW = 0.8;
+    private static final double NOM_MID = 0.4;
+    private static final double NOM_HIGH = 0.15;
+    private static final double LIFT_LOW = 0.52;
+    private static final double LIFT_HIGH = 0.15;
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -59,7 +67,11 @@ public class RaffaHybrid extends LinearOpMode {
     private DcMotor backRight = null;
     private DcMotor horizontalSpool = null;
     private DcMotor verticalSpool = null;
+    private DcMotor latchMotor = null;
+    private DcMotor nomMotor = null;
+
     private Servo liftServo = null;
+    private Servo nomServo = null;
 
     @Override
     public void runOpMode() {
@@ -69,20 +81,23 @@ public class RaffaHybrid extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        frontLeft = hardwareMap.get(DcMotor.class, "TL");
-        frontRight = hardwareMap.get(DcMotor.class, "TR");
-        backLeft = hardwareMap.get(DcMotor.class, "BL");
-        backRight = hardwareMap.get(DcMotor.class, "BR");
-        horizontalSpool = hardwareMap.get(DcMotor.class, "HS");
-        verticalSpool = hardwareMap.get(DcMotor.class, "VS");
-        liftServo = hardwareMap.get(Servo.class, "LS");
+        frontLeft = hardwareMap.get(DcMotor.class, "fl");
+        frontRight = hardwareMap.get(DcMotor.class, "fr");
+        backLeft = hardwareMap.get(DcMotor.class, "bl");
+        backRight = hardwareMap.get(DcMotor.class, "br");
+        horizontalSpool = hardwareMap.get(DcMotor.class, "hsp");
+        verticalSpool = hardwareMap.get(DcMotor.class, "vsp");
+        latchMotor = hardwareMap.get(DcMotor.class, "lch");
+        nomMotor = hardwareMap.get(DcMotor.class, "nom");
+        liftServo = hardwareMap.get(Servo.class, "lsv");
+        nomServo = hardwareMap.get(Servo.class, "nsv");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
 
         // Set motors to brake when power is set to zero.
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -95,6 +110,9 @@ public class RaffaHybrid extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+
+        nomServo.setPosition(NOM_HIGH);
+        liftServo.setPosition(0.15);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -116,6 +134,7 @@ public class RaffaHybrid extends LinearOpMode {
             rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
             horizontalPower   = Range.clip(-gamepad2.left_stick_y, -1.0, 1.0) ;
             verticalPower   = Range.clip(-gamepad2.right_stick_y, -1.0, 1.0) ;
+//            latchPower   = Range.clip(-gamepad2.right_stick_y, -1.0, 1.0) ;
 
             // Apply threshold to motor powers so that they don't stall. If power is below threshold, don't run motor at all.
             if (!(leftPower > DC_MOTOR_THRESHOLD || leftPower < -DC_MOTOR_THRESHOLD)) {
@@ -143,6 +162,35 @@ public class RaffaHybrid extends LinearOpMode {
             backRight.setPower(rightPower);
             horizontalSpool.setPower(horizontalPower);
             verticalSpool.setPower(verticalPower);
+            if (gamepad2.right_bumper) {
+                latchMotor.setPower(0.7);
+            } else if (gamepad2.left_bumper) {
+                latchMotor.setPower(-0.7);
+            } else {
+                latchMotor.setPower(0);
+            }
+
+            if (gamepad2.x) {
+                nomServo.setPosition(NOM_LOW);
+            } else if (gamepad2.y) {
+                nomServo.setPosition(NOM_HIGH);
+            } else if (gamepad2.right_trigger > -0.2) {
+                nomServo.setPosition(NOM_MID);
+            }
+
+            if (gamepad2.dpad_left) {
+                liftServo.setPosition(LIFT_LOW);
+            } else if (gamepad2.dpad_right) {
+                liftServo.setPosition(LIFT_HIGH);
+            }
+
+            if (gamepad2.a) {
+                nomMotor.setPower(-1);
+            } else if (gamepad2.b) {
+                nomMotor.setPower(1);
+            } else {
+                nomMotor.setPower(0);
+            }
 
             // Need to figure out servo positions.
 //            if (gamepad2.left_bumper) {
