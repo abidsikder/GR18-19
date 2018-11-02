@@ -48,9 +48,18 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  *
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
+ *
+ * Negative positions are to the left of the camera and positive ones are to the right.
+ * Move left if gold position is negative or right if it is positive
+ * 
+ *
+ * TODO: figure out how far 1 unit is
+ *
+ *
+ *
+ *
  */
 @TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-@Disabled
 public class ConceptTensorFlowObjectDetection extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
@@ -153,7 +162,6 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
             tfod.shutdown();
         }
     }
-
     public String getGoldPosition() {
         return goldPosition;
     }
