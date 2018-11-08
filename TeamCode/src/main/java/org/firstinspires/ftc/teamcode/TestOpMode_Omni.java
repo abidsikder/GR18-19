@@ -52,10 +52,7 @@ public class TestOpMode_Omni extends OpMode {
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
     private String direction = "forward";
-    private double frontLeftPower = 0;
-    private double frontRightPower = 0;
-    private double backLeftPower = 0;
-    private double backRightPower = 0;
+    public static final double power = 0.4;
 
 
     public void aimForward() {
@@ -86,23 +83,8 @@ public class TestOpMode_Omni extends OpMode {
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
     }
 
-    public void setPower(double power) {
-        frontLeftPower = power;
-        frontRightPower = power;
-        backLeftPower = power;
-        backRightPower = power;
-    }
-
-    public void setDirection(String newDirection) {
-        if (newDirection.equals("forward")) {
-            aimForward();
-        } else if (newDirection.equals("backward")) {
-            aimBackward();
-        } else if (newDirection.equals("left")) {
-            aimLeft();
-        } else if (newDirection.equals("right")) {
-            aimRight();
-        }
+    public void setPower(double newPower) {
+        power = newPower;
     }
 
     /*
@@ -122,9 +104,9 @@ public class TestOpMode_Omni extends OpMode {
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
         direction = "forward";
         telemetry.addData("Status", "Initialized");
@@ -150,28 +132,32 @@ public class TestOpMode_Omni extends OpMode {
      */
     @Override
     public void loop() {
-        // Setup a variable for each drive wheel to save power level for telemetry
-        double leftPower;
-        double rightPower;
-
-        // Choose to drive using either Tank Mode, or POV Mode
-        // Comment out the method that's not used.  The default below is POV.
-
-        // POV Mode uses left stick to go forward, and right stick to turn.
-        // - This uses basic math to combine motions and is easier to drive straight.
-        double drive = -gamepad1.left_stick_y;
-        double turn = gamepad1.right_stick_x;
-        leftPower = Range.clip(drive + turn, -1.0, 1.0);
-        rightPower = Range.clip(drive - turn, -1.0, 1.0);
-
-
-        // Send calculated power to wheels
-        leftDrive.setPower(leftPower);
-        rightDrive.setPower(rightPower);
-
-        // Show the elapsed game time and wheel power.
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        if (gamepad1.dpad_up) {
+            frontLeftDrive.setPower(power);
+            frontRightDrive.setPower(-power);
+            backLeftDrive.setPower(power);
+            backRightDrive.setPower(-power);
+        } else if (gamepad1.dpad_down) {
+            frontLeftDrive.setPower(-power);
+            frontRightDrive.setPower(power);
+            backLeftDrive.setPower(-power);
+            backRightDrive.setPower(power);
+        } else if (gamepad1.dpad_left) {
+            frontLeftDrive.setPower(-power);
+            frontRightDrive.setPower(power);
+            backLeftDrive.setPower(power);
+            backRightDrive.setPower(-power);
+        } else if (gamepad1.dpad_right) {
+            frontLeftDrive.setPower(power);
+            frontRightDrive.setPower(-power);
+            backLeftDrive.setPower(-power);
+            backRightDrive.setPower(power);
+        } else {
+            frontLeftDrive.setPower(0);
+            frontRightDrive.setPower(0);
+            backLeftDrive.setPower(0);
+            backRightDrive.setPower(0);
+        }
     }
 
     /*
