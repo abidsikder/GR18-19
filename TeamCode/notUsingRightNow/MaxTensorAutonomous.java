@@ -148,7 +148,7 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
                             goldPosition="Right";
                           } else {
                             telemetry.addData("Gold Mineral Position", "Center");
-                            goldPosition="Center"
+                            goldPosition="Center";
                           }
                         }
                       }
