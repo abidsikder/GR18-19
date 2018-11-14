@@ -13,8 +13,8 @@ public class ServoTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        liftServo = hardwareMap.get(Servo.class, "lsv");
-        nomServo = hardwareMap.get(Servo.class, "nsv");
+//        liftServo = hardwareMap.get(Servo.class, "lsv");
+        nomServo = hardwareMap.get(Servo.class, "NS");
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -28,7 +28,7 @@ public class ServoTest extends LinearOpMode {
             if (gamepad1.left_bumper) {
                 if (!leftBumper1Pressed) {
                     leftBumper1Pressed = true;
-                    nomServoPosition -= 0.1;
+                    nomServoPosition -= 0.05;
                     nomServo.setPosition(nomServoPosition);
                 }
             } else {
@@ -37,7 +37,7 @@ public class ServoTest extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 if (!rightBumper1Pressed) {
                     rightBumper1Pressed = true;
-                    nomServoPosition += 0.1;
+                    nomServoPosition += 0.05;
                     nomServo.setPosition(nomServoPosition);
                 }
             } else {

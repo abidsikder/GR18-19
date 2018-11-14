@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -13,8 +12,8 @@ import com.qualcomm.robotcore.util.Range;
  * Test opmode for omni chassis
  */
 
-@TeleOp(name = "Test: Omni OpMode", group = "Omni Opmode")
-public class TestOpMode_Omni extends OpMode {
+@TeleOp(name = "OmniTeleOp", group = "Linear Opmode")
+public class OmniTeleOp extends OpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -22,6 +21,9 @@ public class TestOpMode_Omni extends OpMode {
     private DcMotor frontRightDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
+    private DcMotor horizontalSpool = null;
+    private DcMotor nomMotor = null;
+    private Servo nomServo = null;
     public static final double POWER = 0.5;
     public static final double THRESHOLD = 0.25;
 
@@ -40,6 +42,10 @@ public class TestOpMode_Omni extends OpMode {
         backLeftDrive = hardwareMap.get(DcMotor.class, "BL");
         backRightDrive = hardwareMap.get(DcMotor.class, "BR");
 
+        horizontalSpool = hardwareMap.get(DcMotor.class, "HS");
+        nomMotor = hardwareMap.get(DcMotor.class, "NM");
+        nomServo = hardwareMap.get(Servo.class, "NS");
+
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -51,6 +57,7 @@ public class TestOpMode_Omni extends OpMode {
         frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        horizontalSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addData("Status", "Initialized");
     }
@@ -68,61 +75,10 @@ public class TestOpMode_Omni extends OpMode {
     @Override
     public void start() {
         runtime.reset();
+        nomServo.setPosition(0.5);
     }
 
-//    /*
-//     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-//     */
-//    @Override
-//    public void loop() {
-//        if (gamepad1.dpad_up) {
-//            telemetry.addData("direction", "up");
-//            frontLeftDrive.setPower(POWER);
-//            frontRightDrive.setPower(-POWER);
-//            backLeftDrive.setPower(POWER);
-//            backRightDrive.setPower(-POWER);
-//        } else if (gamepad1.dpad_down) {
-//            telemetry.addData("direction", "down");
-//            frontLeftDrive.setPower(-POWER);
-//            frontRightDrive.setPower(POWER);
-//            backLeftDrive.setPower(-POWER);
-//            backRightDrive.setPower(POWER);
-//        } else if (gamepad1.dpad_left) {
-//            telemetry.addData("direction", "left");
-//            frontLeftDrive.setPower(-POWER);
-//            frontRightDrive.setPower(-POWER);
-//            backLeftDrive.setPower(POWER);
-//            backRightDrive.setPower(POWER);
-//        } else if (gamepad1.dpad_right) {
-//            telemetry.addData("direction", "right");
-//            frontLeftDrive.setPower(POWER);
-//            frontRightDrive.setPower(POWER);
-//            backLeftDrive.setPower(-POWER);
-//            backRightDrive.setPower(-POWER);
-//        } else if (gamepad1.left_bumper) {
-//            telemetry.addData("direction", "turn left");
-//            frontLeftDrive.setPower(-POWER);
-//            frontRightDrive.setPower(-POWER);
-//            backLeftDrive.setPower(-POWER);
-//            backRightDrive.setPower(-POWER);
-//        } else if (gamepad1.right_bumper) {
-//            telemetry.addData("direction", "turn right");
-//            frontLeftDrive.setPower(POWER);
-//            frontRightDrive.setPower(POWER);
-//            backLeftDrive.setPower(POWER);
-//            backRightDrive.setPower(POWER);
-//        } else {
-//            telemetry.addData("direction", "none");
-//            frontLeftDrive.setPower(0);
-//            frontRightDrive.setPower(0);
-//            backLeftDrive.setPower(0);
-//            backRightDrive.setPower(0);
-//        }
-//        telemetry.update();
-//    }
-    @Override
-    public void loop() {
-
+    public void drive() {
         float leftY = -gamepad1.left_stick_y;
         float leftX = gamepad1.left_stick_x;
         float rightX = gamepad1.right_stick_x;
@@ -147,7 +103,28 @@ public class TestOpMode_Omni extends OpMode {
         frontRightDrive.setPower(frontRight);
         backRightDrive.setPower(backRight);
         backLeftDrive.setPower(backLeft);
+    }
 
+    @Override
+    public void loop() {
+        drive();
+
+        horizontalSpool.setPower(applyThreshold(gamepad2.left_stick_x*0.5));
+        if (gamepad2.dpad_left) {
+            nomMotor.setPower(-1);
+        } else if (gamepad2.dpad_right) {
+            nomMotor.setPower(1);
+        } else {
+            nomMotor.setPower(0);
+        }
+
+        if (gamepad2.x) {
+            nomServo.setPosition(0.1);
+        } else if (gamepad2.y) {
+            nomServo.setPosition(0.5);
+        } else if (gamepad2.b) {
+            nomServo.setPosition(0.9);
+        }
     }
 
     public static double applyThreshold(double d) {
