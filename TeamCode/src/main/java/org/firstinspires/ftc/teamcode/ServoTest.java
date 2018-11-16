@@ -4,22 +4,25 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="ServoTest", group="Linear Opmode")
-public class ServoTest extends LinearOpMode {
+public abstract class ServoTest extends LinearOpMode {
 
-    private Servo liftServo = null;
-    private Servo nomServo = null;
+//    private Servo liftServo = null;
+    private Servo servo = null;
+
+    public abstract String servoName();
 
     @Override
     public void runOpMode() throws InterruptedException {
 
 //        liftServo = hardwareMap.get(Servo.class, "lsv");
-        nomServo = hardwareMap.get(Servo.class, "NS");
+        servo = hardwareMap.get(Servo.class, servoName());
+
+//        liftServo = hardwareMap.get(Servo.class, "LS");
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        double nomServoPosition = 0.5;
+        double servoPosition = 0.5;
         boolean leftBumper1Pressed = false;
         boolean rightBumper1Pressed = false;
 
@@ -28,8 +31,8 @@ public class ServoTest extends LinearOpMode {
             if (gamepad1.left_bumper) {
                 if (!leftBumper1Pressed) {
                     leftBumper1Pressed = true;
-                    nomServoPosition -= 0.05;
-                    nomServo.setPosition(nomServoPosition);
+                    servoPosition -= 0.05;
+                    servo.setPosition(servoPosition);
                 }
             } else {
                 leftBumper1Pressed = false;
@@ -37,13 +40,13 @@ public class ServoTest extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 if (!rightBumper1Pressed) {
                     rightBumper1Pressed = true;
-                    nomServoPosition += 0.05;
-                    nomServo.setPosition(nomServoPosition);
+                    servoPosition += 0.05;
+                    servo.setPosition(servoPosition);
                 }
             } else {
                 rightBumper1Pressed = false;
             }
-            telemetry.addData("nom", nomServoPosition);
+            telemetry.addData("pos", servoPosition);
             telemetry.update();
 //            if (gamepad1.left_bumper) {
 //                nomServo.setPosition(0.15);

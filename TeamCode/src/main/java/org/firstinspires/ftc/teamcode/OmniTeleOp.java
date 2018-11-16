@@ -22,10 +22,22 @@ public class OmniTeleOp extends OpMode {
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
     private DcMotor horizontalSpool = null;
+    private DcMotor verticalSpool = null;
     private DcMotor nomMotor = null;
     private Servo nomServo = null;
+    private Servo liftServo = null;
     public static final double POWER = 0.5;
     public static final double THRESHOLD = 0.25;
+
+    public static final double LIFT_SERVO_FORWARD = 0.2;
+    public static final double LIFT_SERVO_MID = 0.38;
+    public static final double LIFT_SERVO_BACK = 0.55;
+
+    public static final double NOM_SERVO_DOWN_LOW = 0.1;
+    public static final double NOM_SERVO_DOWN_HIGH = 0.15;
+    public static final double NOM_SERVO_MID = 0.4;
+    public static final double NOM_SERVO_UP = 0.9;
+    // 0.1   0.3   0.9
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -43,8 +55,10 @@ public class OmniTeleOp extends OpMode {
         backRightDrive = hardwareMap.get(DcMotor.class, "BR");
 
         horizontalSpool = hardwareMap.get(DcMotor.class, "HS");
+        verticalSpool = hardwareMap.get(DcMotor.class, "VS");
         nomMotor = hardwareMap.get(DcMotor.class, "NM");
         nomServo = hardwareMap.get(Servo.class, "NS");
+        liftServo = hardwareMap.get(Servo.class, "LS");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -75,7 +89,8 @@ public class OmniTeleOp extends OpMode {
     @Override
     public void start() {
         runtime.reset();
-        nomServo.setPosition(0.5);
+        nomServo.setPosition(NOM_SERVO_UP);
+        liftServo.setPosition(LIFT_SERVO_FORWARD);
     }
 
     public void drive() {
@@ -110,20 +125,31 @@ public class OmniTeleOp extends OpMode {
         drive();
 
         horizontalSpool.setPower(applyThreshold(gamepad2.left_stick_x*0.5));
-        if (gamepad2.dpad_left) {
+        verticalSpool.setPower(applyThreshold(gamepad2.right_stick_x));
+        if (gamepad2.left_bumper) {
             nomMotor.setPower(-1);
-        } else if (gamepad2.dpad_right) {
+        } else if (gamepad2.right_bumper) {
             nomMotor.setPower(1);
         } else {
             nomMotor.setPower(0);
         }
 
-        if (gamepad2.x) {
-            nomServo.setPosition(0.1);
-        } else if (gamepad2.y) {
-            nomServo.setPosition(0.5);
-        } else if (gamepad2.b) {
-            nomServo.setPosition(0.9);
+        if (gamepad2.y) {
+            nomServo.setPosition(NOM_SERVO_UP);
+        } else if (gamepad2.x) {
+            nomServo.setPosition(NOM_SERVO_MID);
+        } else if (gamepad2.a) {
+            nomServo.setPosition(NOM_SERVO_DOWN_LOW);
+        } else if (gamepad2.right_trigger > 0.3) {
+            nomServo.setPosition(NOM_SERVO_DOWN_HIGH);
+        }
+
+        if (gamepad2.dpad_down) {
+            liftServo.setPosition(LIFT_SERVO_BACK);
+        } else if (gamepad2.dpad_up) {
+            liftServo.setPosition(LIFT_SERVO_FORWARD);
+        } else if (gamepad2.dpad_left) {
+            liftServo.setPosition(LIFT_SERVO_MID);
         }
     }
 
