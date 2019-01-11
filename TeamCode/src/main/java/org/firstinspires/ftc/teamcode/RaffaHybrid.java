@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -46,6 +47,7 @@ import com.qualcomm.robotcore.util.Range;
  * Right and left are from the robot's perspective
  */
 
+@Disabled
 @TeleOp(name="RaffaHybrid", group="Linear Opmode")
 public class RaffaHybrid extends LinearOpMode {
 

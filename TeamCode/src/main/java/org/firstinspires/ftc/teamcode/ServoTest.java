@@ -31,7 +31,11 @@ public abstract class ServoTest extends LinearOpMode {
             if (gamepad1.left_bumper) {
                 if (!leftBumper1Pressed) {
                     leftBumper1Pressed = true;
-                    servoPosition -= 0.05;
+                    if (!gamepad1.b) {
+                        servoPosition -= 0.05;
+                    } else {
+                        servoPosition -= 0.01;
+                    }
                     servo.setPosition(servoPosition);
                 }
             } else {
@@ -40,7 +44,11 @@ public abstract class ServoTest extends LinearOpMode {
             if (gamepad1.right_bumper) {
                 if (!rightBumper1Pressed) {
                     rightBumper1Pressed = true;
-                    servoPosition += 0.05;
+                    if (!gamepad1.b) {
+                        servoPosition += 0.05;
+                    } else {
+                        servoPosition += 0.01;
+                    }
                     servo.setPosition(servoPosition);
                 }
             } else {

@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.Range;
  * Test opmode for omni chassis
  */
 
+@Disabled
 @TeleOp(name = "Test: Omni OpMode", group = "Omni Opmode")
 public class TestOpMode_Omni extends OpMode {
 

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -15,8 +16,8 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name = "OmniTeleOp", group = "Linear Opmode")
 public class OmniTeleOp extends OpMode {
 
-    public static final int LATCH_RANGE = 44000;
-    public static final int LATCH_ALLOWANCE = 250;
+    public static final int LATCH_RANGE = 23000;
+    public static final int LATCH_ALLOWANCE = 25;
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -24,10 +25,10 @@ public class OmniTeleOp extends OpMode {
     private DcMotor frontRightDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
-//    private DcMotor horizontalSpool = null;
+    //    private DcMotor horizontalSpool = null;
 //    private DcMotor verticalSpool = null;
-//    private DcMotor nomMotor = null;
-//    private Servo nomServo = null;
+    private DcMotor nomMotor = null;
+    private Servo nomServo = null;
 //    private Servo liftServo = null;
     private DcMotor latch = null;
     public static final double POWER = 0.5;
@@ -57,10 +58,11 @@ public class OmniTeleOp extends OpMode {
         frontRightDrive = hardwareMap.get(DcMotor.class, "FR");
         backLeftDrive = hardwareMap.get(DcMotor.class, "BL");
         backRightDrive = hardwareMap.get(DcMotor.class, "BR");
+        nomServo = hardwareMap.get(Servo.class, "NS");
 
 //        horizontalSpool = hardwareMap.get(DcMotor.class, "HS");
 //        verticalSpool = hardwareMap.get(DcMotor.class, "VS");
-//        nomMotor = hardwareMap.get(DcMotor.class, "NM");
+        nomMotor = hardwareMap.get(DcMotor.class, "NOM");
 //        nomServo = hardwareMap.get(Servo.class, "NS");
 //        liftServo = hardwareMap.get(Servo.class, "LS");
         latch = hardwareMap.get(DcMotor.class, "LATCH");
@@ -70,7 +72,7 @@ public class OmniTeleOp extends OpMode {
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         backRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
@@ -97,6 +99,7 @@ public class OmniTeleOp extends OpMode {
     @Override
     public void start() {
         runtime.reset();
+        nomServo.setPosition(0.15);
 //        nomServo.setPosition(NOM_SERVO_UP);
 //        liftServo.setPosition(LIFT_SERVO_FORWARD);
     }
@@ -128,10 +131,36 @@ public class OmniTeleOp extends OpMode {
         backLeftDrive.setPower(backLeft);
     }
 
+    public void motorTest() {
+        if (gamepad1.dpad_left) {
+            frontLeftDrive.setPower(1);
+        } else {
+            frontLeftDrive.setPower(0);
+        }
+
+        if (gamepad1.dpad_up) {
+            frontRightDrive.setPower(1);
+        } else {
+            frontRightDrive.setPower(0);
+        }
+
+        if (gamepad1.dpad_right) {
+            backRightDrive.setPower(1);
+        } else {
+            backRightDrive.setPower(0);
+        }
+
+        if (gamepad1.dpad_down) {
+            backLeftDrive.setPower(1);
+        } else {
+            backLeftDrive.setPower(0);
+        }
+    }
+
     public void moveLatch() {
-        if (gamepad1.left_bumper && latch.getCurrentPosition() > LATCH_ALLOWANCE) {
+        if (gamepad1.left_bumper && latch.getCurrentPosition() > -LATCH_RANGE + LATCH_ALLOWANCE) {
             latch.setPower(-1);
-        } else if (gamepad1.right_bumper && latch.getCurrentPosition() < LATCH_RANGE - LATCH_ALLOWANCE) {
+        } else if (gamepad1.right_bumper && latch.getCurrentPosition() < - LATCH_ALLOWANCE) {
             latch.setPower(1);
         } else {
             latch.setPower(0);
@@ -141,16 +170,18 @@ public class OmniTeleOp extends OpMode {
     @Override
     public void loop() {
         drive();
+//        motorTest();
+        moveLatch();
 
 //        horizontalSpool.setPower(applyThreshold(gamepad2.left_stick_x*0.5));
 //        verticalSpool.setPower(applyThreshold(gamepad2.right_stick_x));
-//        if (gamepad2.left_bumper) {
-//            nomMotor.setPower(-1);
-//        } else if (gamepad2.right_bumper) {
-//            nomMotor.setPower(1);
-//        } else {
-//            nomMotor.setPower(0);
-//        }
+        if (gamepad2.left_bumper) {
+            nomMotor.setPower(-1);
+        } else if (gamepad2.right_bumper) {
+            nomMotor.setPower(1);
+        } else {
+            nomMotor.setPower(0);
+        }
 //
 //        if (gamepad2.y) {
 //            nomServo.setPosition(NOM_SERVO_UP);
@@ -161,6 +192,13 @@ public class OmniTeleOp extends OpMode {
 //        } else if (gamepad2.right_trigger > 0.3) {
 //            nomServo.setPosition(NOM_SERVO_DOWN_HIGH);
 //        }
+        if (gamepad2.a) {
+            nomServo.setPosition(0.76);
+        } else if (gamepad2.x) {
+            nomServo.setPosition(0.36);
+        } else if (gamepad2.y) {
+            nomServo.setPosition(0.15);
+        }
 //
 //        if (gamepad2.dpad_down) {
 //            liftServo.setPosition(LIFT_SERVO_BACK);

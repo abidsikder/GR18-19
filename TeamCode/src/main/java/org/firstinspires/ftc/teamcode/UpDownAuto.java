@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -14,6 +15,7 @@ import static org.firstinspires.ftc.teamcode.OmniTeleOp.*;
  * Test opmode for omni chassis
  */
 
+@Disabled
 @TeleOp(name = "UpDownAuto", group = "Autonomous")
 public class UpDownAuto extends LinearOpMode {
 
