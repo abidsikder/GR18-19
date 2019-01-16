@@ -74,7 +74,7 @@ public class UpDownAuto extends LinearOpMode {
         waitForStart();
 
         runtime.reset();
-        nomServo.setPosition(NOM_SERVO_UP);
+        nomServo.setPosition(NOM_SERVO_IN);
         liftServo.setPosition(LIFT_SERVO_FORWARD);
 
         latch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

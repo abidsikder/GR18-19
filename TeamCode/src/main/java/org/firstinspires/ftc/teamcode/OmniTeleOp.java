@@ -38,10 +38,15 @@ public class OmniTeleOp extends OpMode {
     public static final double LIFT_SERVO_MID = 0.38;
     public static final double LIFT_SERVO_BACK = 0.55;
 
-    public static final double NOM_SERVO_DOWN_LOW = 0.1;
-    public static final double NOM_SERVO_DOWN_HIGH = 0.15;
+//    public static final double NOM_SERVO_DOWN_LOW = 0.1;
+//    public static final double NOM_SERVO_DOWN_HIGH = 0.15;
+//    public static final double NOM_SERVO_MID = 0.4;
+//    public static final double NOM_SERVO_UP = 0.9;
+    public static final double NOM_SERVO_DUMP = 0.6;
+    public static final double NOM_SERVO_IN = 0.75;
     public static final double NOM_SERVO_MID = 0.4;
-    public static final double NOM_SERVO_UP = 0.9;
+    public static final double NOM_SERVO_ALMOST_DOWN = 0.25;
+    public static final double NOM_SERVO_DOWN = 0.19;
     // 0.1   0.3   0.9
 
     /*
@@ -99,7 +104,7 @@ public class OmniTeleOp extends OpMode {
     @Override
     public void start() {
         runtime.reset();
-        nomServo.setPosition(0.15);
+        nomServo.setPosition(NOM_SERVO_IN);
 //        nomServo.setPosition(NOM_SERVO_UP);
 //        liftServo.setPosition(LIFT_SERVO_FORWARD);
     }
@@ -167,6 +172,8 @@ public class OmniTeleOp extends OpMode {
         }
     }
 
+    boolean almostDown = false;
+
     @Override
     public void loop() {
         drive();
@@ -193,11 +200,20 @@ public class OmniTeleOp extends OpMode {
 //            nomServo.setPosition(NOM_SERVO_DOWN_HIGH);
 //        }
         if (gamepad2.a) {
-            nomServo.setPosition(0.76);
+            nomServo.setPosition(NOM_SERVO_ALMOST_DOWN);
+            almostDown = true;
         } else if (gamepad2.x) {
-            nomServo.setPosition(0.36);
+            nomServo.setPosition(NOM_SERVO_MID);
+            almostDown = false;
         } else if (gamepad2.y) {
-            nomServo.setPosition(0.15);
+            nomServo.setPosition(NOM_SERVO_DUMP);
+            almostDown = false;
+        } else if (gamepad2.right_trigger > 0.4) {
+            nomServo.setPosition(NOM_SERVO_IN);
+            almostDown = false;
+        } else if (almostDown) {
+            nomServo.setPosition(NOM_SERVO_DOWN);
+            almostDown = false;
         }
 //
 //        if (gamepad2.dpad_down) {
