@@ -10,44 +10,49 @@ import com.qualcomm.robotcore.util.Range;
 
 
 /**
- * Test opmode for omni chassis
+ * Main TeleOp OpMode
  */
 
 @TeleOp(name = "OmniTeleOp", group = "Linear Opmode")
 public class OmniTeleOp extends OpMode {
 
+    // --------------------------------------
+    // Latch encoder constants
     public static final int LATCH_RANGE = 23000;
     public static final int LATCH_ALLOWANCE = 25;
 
-    // Declare OpMode members.
+
+    /**
+     * Amount of time elapsed
+     */
     private ElapsedTime runtime = new ElapsedTime();
+
+    // --------------------------------------
+    // Declare motors
     private DcMotor frontLeftDrive = null;
     private DcMotor frontRightDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
-    //    private DcMotor horizontalSpool = null;
-//    private DcMotor verticalSpool = null;
+    private DcMotor horizontalSpool = null;
+    private DcMotor verticalSpool = null;
     private DcMotor nomMotor = null;
     private Servo nomServo = null;
-//    private Servo liftServo = null;
+    private Servo liftServo = null;
     private DcMotor latch = null;
     public static final double POWER = 0.5;
     public static final double THRESHOLD = 0.25;
 
-    public static final double LIFT_SERVO_FORWARD = 0.2;
-    public static final double LIFT_SERVO_MID = 0.38;
-    public static final double LIFT_SERVO_BACK = 0.55;
+    // --------------------------------------
+    // Servo Positions
+    public static final double LIFT_SERVO_FORWARD = .15;
+    public static final double LIFT_SERVO_MID = 0.35;
+    public static final double LIFT_SERVO_BACK = 0.75;
 
-//    public static final double NOM_SERVO_DOWN_LOW = 0.1;
-//    public static final double NOM_SERVO_DOWN_HIGH = 0.15;
-//    public static final double NOM_SERVO_MID = 0.4;
-//    public static final double NOM_SERVO_UP = 0.9;
     public static final double NOM_SERVO_DUMP = 0.6;
     public static final double NOM_SERVO_IN = 0.75;
     public static final double NOM_SERVO_MID = 0.4;
     public static final double NOM_SERVO_ALMOST_DOWN = 0.25;
     public static final double NOM_SERVO_DOWN = 0.19;
-    // 0.1   0.3   0.9
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -56,20 +61,24 @@ public class OmniTeleOp extends OpMode {
     public void init() {
         telemetry.addData("Status", "Initialized");
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
+        // Initialize drive motors
         frontLeftDrive = hardwareMap.get(DcMotor.class, "FL");
         frontRightDrive = hardwareMap.get(DcMotor.class, "FR");
         backLeftDrive = hardwareMap.get(DcMotor.class, "BL");
         backRightDrive = hardwareMap.get(DcMotor.class, "BR");
-        nomServo = hardwareMap.get(Servo.class, "NS");
 
-//        horizontalSpool = hardwareMap.get(DcMotor.class, "HS");
-//        verticalSpool = hardwareMap.get(DcMotor.class, "VS");
+        // Initialize servos
+        nomServo = hardwareMap.get(Servo.class, "NS");
+        liftServo = hardwareMap.get(Servo.class, "LS");
+
+        // Initialize spool motors
+        verticalSpool = hardwareMap.get(DcMotor.class, "VS");
+        horizontalSpool = hardwareMap.get(DcMotor.class, "HS");
+
+        // Initialize intake motor
         nomMotor = hardwareMap.get(DcMotor.class, "NOM");
-//        nomServo = hardwareMap.get(Servo.class, "NS");
-//        liftServo = hardwareMap.get(Servo.class, "LS");
+
+        // Initialize latch motor
         latch = hardwareMap.get(DcMotor.class, "LATCH");
         latch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         latch.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -86,16 +95,10 @@ public class OmniTeleOp extends OpMode {
         backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         latch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        horizontalSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        horizontalSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        verticalSpool.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addData("Status", "Initialized");
-    }
-
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
-    @Override
-    public void init_loop() {
     }
 
     /*
@@ -106,7 +109,7 @@ public class OmniTeleOp extends OpMode {
         runtime.reset();
         nomServo.setPosition(NOM_SERVO_IN);
 //        nomServo.setPosition(NOM_SERVO_UP);
-//        liftServo.setPosition(LIFT_SERVO_FORWARD);
+        liftServo.setPosition(LIFT_SERVO_FORWARD);
     }
 
     public void drive() {
@@ -129,6 +132,13 @@ public class OmniTeleOp extends OpMode {
         frontRight = applyThreshold(frontRight * POWER);
         backLeft = applyThreshold(backLeft * POWER);
         backRight = applyThreshold(backRight * POWER);
+
+        if (gamepad1.right_trigger > 0.2) {
+            frontLeft = frontLeft / 2;
+            frontRight = frontRight / 2;
+            backLeft = backLeft / 2;
+            backRight = backRight / 2;
+        }
 
         frontLeftDrive.setPower(frontLeft);
         frontRightDrive.setPower(frontRight);
@@ -165,23 +175,25 @@ public class OmniTeleOp extends OpMode {
     public void moveLatch() {
         if (gamepad1.left_bumper && latch.getCurrentPosition() > -LATCH_RANGE + LATCH_ALLOWANCE) {
             latch.setPower(-1);
-        } else if (gamepad1.right_bumper && latch.getCurrentPosition() < - LATCH_ALLOWANCE) {
+        } else if (gamepad1.right_bumper && latch.getCurrentPosition() < -LATCH_ALLOWANCE) {
             latch.setPower(1);
         } else {
             latch.setPower(0);
         }
     }
 
-    boolean almostDown = false;
+    private boolean almostDown = false;
 
     @Override
     public void loop() {
         drive();
-//        motorTest();
         moveLatch();
 
-//        horizontalSpool.setPower(applyThreshold(gamepad2.left_stick_x*0.5));
-//        verticalSpool.setPower(applyThreshold(gamepad2.right_stick_x));
+        // Move spools
+        horizontalSpool.setPower(applyThreshold(gamepad2.left_stick_x * 0.5));
+        verticalSpool.setPower(applyThreshold(-gamepad2.right_stick_y));
+
+        // Move intake motor
         if (gamepad2.left_bumper) {
             nomMotor.setPower(-1);
         } else if (gamepad2.right_bumper) {
@@ -189,16 +201,8 @@ public class OmniTeleOp extends OpMode {
         } else {
             nomMotor.setPower(0);
         }
-//
-//        if (gamepad2.y) {
-//            nomServo.setPosition(NOM_SERVO_UP);
-//        } else if (gamepad2.x) {
-//            nomServo.setPosition(NOM_SERVO_MID);
-//        } else if (gamepad2.a) {
-//            nomServo.setPosition(NOM_SERVO_DOWN_LOW);
-//        } else if (gamepad2.right_trigger > 0.3) {
-//            nomServo.setPosition(NOM_SERVO_DOWN_HIGH);
-//        }
+
+        // Set nom servo position
         if (gamepad2.a) {
             nomServo.setPosition(NOM_SERVO_ALMOST_DOWN);
             almostDown = true;
@@ -215,14 +219,13 @@ public class OmniTeleOp extends OpMode {
             nomServo.setPosition(NOM_SERVO_DOWN);
             almostDown = false;
         }
-//
-//        if (gamepad2.dpad_down) {
-//            liftServo.setPosition(LIFT_SERVO_BACK);
-//        } else if (gamepad2.dpad_up) {
-//            liftServo.setPosition(LIFT_SERVO_FORWARD);
-//        } else if (gamepad2.dpad_left) {
-//            liftServo.setPosition(LIFT_SERVO_MID);
-//        }
+
+        // Set lift servo position
+        if (gamepad2.dpad_left) {
+            liftServo.setPosition(LIFT_SERVO_BACK);
+        } else if (gamepad2.dpad_right) {
+            liftServo.setPosition(LIFT_SERVO_FORWARD);
+        }
     }
 
     public static double applyThreshold(double d) {
@@ -231,13 +234,6 @@ public class OmniTeleOp extends OpMode {
         } else {
             return d;
         }
-    }
-
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
     }
 
 }
