@@ -27,19 +27,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
+import java.util.List;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-
-import java.util.List;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
 /**
  * This 2018-2019 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -50,17 +48,42 @@ import java.util.List;
  *
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
+ *
+ * Negative positions are to the left of the camera and positive ones are to the right.
+ * Move left if gold position is negative or right if it is positive
+ * 
+ *
+ * TODO: figure out how far 1 unit is
+ *
+ *
+ *
+ *
  */
-@TeleOp(name = "TFTest", group = "Concept")
-public class TFTest extends LinearOpMode {
+@Disabled
+@TeleOp(name = "AutoTeleOp", group = "Linear Opmode")
+public class AutoTeleOp extends OpMode {
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    String goldPosition = "";
+    double goldMineralX = -1;
+    double silverMineral1X = -1;
+    double silverMineral2X = -1;
+
 
     /*
-     * Vuforia license key
+     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
+     * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
+     * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
+     * web site at https://developer.vuforia.com/license-manager.
+     *
+     * Vuforia license keys are always 380 characters long, and look as if they contain mostly
+     * random data. As an example, here is a example of a fragment of a valid key:
+     *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
+     * Once you've obtained a license key, copy the string from the Vuforia web site
+     * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY = "Aeba4Qn/////AAAAGahNOxzreUE8nItPWzsrOlF7uoyrR/qbjue3kUmhxZcfZMSd5MRyEY+3uEoVA+gpQGz5KyP3wEjBxSOAb4+FBYMZ+QblFU4byMG4+aiI+GeeBA+RatQXVzSduRBdniCW4qehTnwS204KTUMXg1ioPvUlbYQmqM5aPMx/2xnYN1b+htNBWV0Bc8Vkyspa0NNgz7PzF1gozlCIc9FgzbzNYoOMhqSG+jhKf47SZQxD6iEAtj5iAkWBvJwFDLr/EfDfPr3BIA6Cpb4xaDc0t4Iz5wJ/p4oLRiEJaLoE/noCcWFjLmPcw9ccwYXThtjC+7u0DsMX+r+1dMikBCZCWWkLzEyjWzy3pOOR3exNRYGZ0vzr";
+    private static final String VUFORIA_KEY = "ATLaKaT/////AAABmShRhhpMtk7/mWrDxLa9x6ki33vBhKgnrXEEI9XxVgocQfo7PTIjK7lITb9xKkZ8HKsWgVlVea5HN9RKZP/tj9Ws7t2o1KPh+as+FvXcgv+rCMJAfjhLfEUUnBj+WeDALI+r+tb5X5jvFGCbWcW1Uc8M9kFq9i3rlDLd3CtbPeT13zECj/4SaLVOiE9SkZ6v1IlkjvYd3cBf5h2y2GHMODgJDEJU2jw46kII3fYIi6OdhJzaMH7FmUBqkr+03eg+Il0mT/oYuEmlvN7M0xV6FhCS6I3dS+vNSKb0KQCY7vK/hZBzk2rBjQlsfuowSzyrRdxqNneyuaKUy5zKrkTBprfr4kAwGQJW4oPLui2UTTSW";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -102,13 +125,13 @@ public class TFTest extends LinearOpMode {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
+                    if (updatedRecognitions != null) { // if there is something
                       telemetry.addData("# Object Detected", updatedRecognitions.size());
-                      if (updatedRecognitions.size() == 3) {
-                        int goldMineralX = -1;
-                        int silverMineral1X = -1;
-                        int silverMineral2X = -1;
-                        for (Recognition recognition : updatedRecognitions) {
+                      if (updatedRecognitions.size() == 3) { // if it sees exactly three objects
+                        goldMineralX = -1;
+                        silverMineral1X = -1;
+                        silverMineral2X = -1;
+                        for (Recognition recognition : updatedRecognitions) { // for each object
                           if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
                             goldMineralX = (int) recognition.getLeft();
                           } else if (silverMineral1X == -1) {
@@ -120,10 +143,13 @@ public class TFTest extends LinearOpMode {
                         if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                           if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
                             telemetry.addData("Gold Mineral Position", "Left");
+                            goldPosition="Left";
                           } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
                             telemetry.addData("Gold Mineral Position", "Right");
+                            goldPosition="Right";
                           } else {
                             telemetry.addData("Gold Mineral Position", "Center");
+                            goldPosition="Center";
                           }
                         }
                       }
@@ -136,6 +162,21 @@ public class TFTest extends LinearOpMode {
         if (tfod != null) {
             tfod.shutdown();
         }
+    }
+    public String getGoldPosition() {
+        return goldPosition;
+    }
+
+    public double getGoldMineralX() {
+        return goldMineralX;
+    }
+
+    public double getSilverMineral1X() {
+        return silverMineral1X;
+    }
+
+    public double getSilverMineral2X() {
+        return silverMineral2X;
     }
 
     /**
