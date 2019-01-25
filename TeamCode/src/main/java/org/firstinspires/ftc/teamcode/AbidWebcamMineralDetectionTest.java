@@ -6,45 +6,34 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="OmniAutoCrater", group="Autonomous")
-public class OmniAutoCrater extends LinearOpMode {
-
-    public static final int CONVERSION_FACTOR = 44000;
-
-//    private Servo liftServo = null;
-    private DcMotor latch = null;
+@Autonomous(name="AbidWebcamMineralDetectionTest", group="Autonomous")
+public class AbidWebcamMineralDetectionTest extends LinearOpMode {
 
     private DcMotor frontLeftDrive = null;
     private DcMotor frontRightDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
 
-    private Servo nomServo = null;
-
     public static final double POWER = 0.5;
     public static final double THRESHOLD = 0.25;
 
-    public static final double NOM_SERVO_UP = 0.1;
-    public static final double NOM_SERVO_DOWN = 0.8;
+    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+
+    private static final String VUFORIA_KEY =
+            "ATUUQRD/////AAABmWvkn/HpKkiTkmH+kqcdQa87+E5nnizSTMHex9sTxsSbub3m/AzfdamdYGP7pwr/6Ea3A5aHYC35fc9Nw8wFLofmMHwKHSwnm6wC/kS6oEspjXxlk7p3YKgHpe9iWIuvYVHDI211sVIxCg+wd8DvtdoFulhQ+dLLSajTNryZpsKgOJRHKnq4KREOb3jticHQpvTWDrM3O3yya3F5KEOBUr5ekhLxz06M7VpmIeuCc6FTw3RxRQ6qtqKfXxCzCK0ziyyDyMlBCie0WH1gvI1kKhk3modRIaJfaTcAw54REWyTfIhhV3A4Nyp/99j1FYonm94fu/gvOemiGDI1WWotAOSYqxnLmru7vN7kSzlsKits";
 
     private ElapsedTime runtime = new ElapsedTime();
-
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        latch = hardwareMap.get(DcMotor.class, "LATCH");
-
-        latch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        latch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        latch.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+        // Driving Initializer Code
         frontLeftDrive = hardwareMap.get(DcMotor.class, "FL");
         frontRightDrive = hardwareMap.get(DcMotor.class, "FR");
         backLeftDrive = hardwareMap.get(DcMotor.class, "BL");
         backRightDrive = hardwareMap.get(DcMotor.class, "BR");
-        nomServo = hardwareMap.get(Servo.class, "NS");
 
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -56,46 +45,9 @@ public class OmniAutoCrater extends LinearOpMode {
         backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        tf.initialize();
-
         waitForStart();
 
-        nomServo.setPosition(NOM_SERVO_UP);
 
-        runLatchToPosition(23000);
-        driveRightForSeconds(0.5, 0.5);
-        driveForwardForSeconds(0.5, 0.5);
-
-//        int tfResult = tf.detect();
-//        if (tfResult == 0) {
-//            sampleLeft();
-//        } else if (tfResult == 1) {
-//            sampleCenter();
-//        } else {
-//            sampleRight();
-//        }
-//        driveTest();
-
-    }
-
-    public void runLatchToPosition(int targetPosition) {
-        if (targetPosition > latch.getCurrentPosition()) {
-            latch.setPower(1);
-            while (opModeIsActive() && targetPosition > latch.getCurrentPosition()) {
-                telemetry.addData("Going", true);
-                telemetry.addData("Position", latch.getCurrentPosition());
-                telemetry.update();
-            }
-            latch.setPower(0);
-        } else if (targetPosition < latch.getCurrentPosition()) {
-            latch.setPower(-1);
-            while (opModeIsActive() && targetPosition < latch.getCurrentPosition()) {
-                telemetry.addData("Going", true);
-                telemetry.addData("Position", latch.getCurrentPosition());
-                telemetry.update();
-            }
-            latch.setPower(0);
-        }
     }
 
     void driveForwardForSeconds(double power, double seconds) {
@@ -154,16 +106,8 @@ public class OmniAutoCrater extends LinearOpMode {
         turnClockwise(POWER, 1);
         turnClockwise(-POWER, 1);
     }
-    
-    void sampleLeft() {
 
-    }
+    // functions copy-pasted from the webcam detection tester
 
-    void sampleCenter() {
 
-    }
-
-    void sampleRight() {
-
-    }
 }

@@ -34,8 +34,6 @@ public class OmniAutoDepot extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        TFDetectionTwo tf = new TFDetectionTwo(telemetry, this);
-
         latch = hardwareMap.get(DcMotor.class, "LATCH");
 
         latch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
