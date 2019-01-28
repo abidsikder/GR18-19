@@ -42,7 +42,7 @@ public class OmniWebcamAuto extends LinearOpMode {
     // 0 = left
     // 1 = center
     // 2 = right
-    public int goldParticlePosition = -1;
+    public int goldMineralPosition = -1;
 
     /* END variables needed for mineral detection */
 
@@ -70,6 +70,7 @@ public class OmniWebcamAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // Procedures Needed to Set Up Autonomous
+
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
@@ -82,6 +83,7 @@ public class OmniWebcamAuto extends LinearOpMode {
 
         // Procedures needed to set up mechanical stuff
 
+        // latch
         latch = hardwareMap.get(DcMotor.class, "LATCH");
 
         latch.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -89,11 +91,18 @@ public class OmniWebcamAuto extends LinearOpMode {
         latch.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         latch.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        // Nom Servo
+        nomServo = hardwareMap.get(Servo.class, "NS");
+
+        // team marker
+        // INTENTIONALLY LEFT EMPTY FOR NOW
+
+        // movement around field
         frontLeftDrive = hardwareMap.get(DcMotor.class, "FL");
         frontRightDrive = hardwareMap.get(DcMotor.class, "FR");
         backLeftDrive = hardwareMap.get(DcMotor.class, "BL");
         backRightDrive = hardwareMap.get(DcMotor.class, "BR");
-        nomServo = hardwareMap.get(Servo.class, "NS");
+
 
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -110,14 +119,26 @@ public class OmniWebcamAuto extends LinearOpMode {
         nomServo.setPosition(NOM_SERVO_UP);
 
         while (opModeIsActive()) {
+            // de-latch and come down
+            /**
+             * TODO
+             */
+
             // find the position of the gold mineral
             if (tfod != null) {
+
                 tfod.activate();
+
+                // wait for a second once on the ground to let the recognition program settle
+                waitForSeconds(1);
+
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+
+                telemetry.addData("# Object Detected", updatedRecognitions.size());
+
                 if (updatedRecognitions != null) {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
                     int goldMineralX = -1;
                     int silverMineral1X = -1;
                     int silverMineral2X = -1;
@@ -134,32 +155,89 @@ public class OmniWebcamAuto extends LinearOpMode {
                         }
                         if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
                             if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+                                goldMineralPosition = 0;
                                 telemetry.addData("Gold Mineral Position", "Left");
                             } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                                goldMineralPosition = 2;
                                 telemetry.addData("Gold Mineral Position", "Right");
                             } else {
+                                goldMineralPosition = 1;
                                 telemetry.addData("Gold Mineral Position", "Center");
                             }
                         } // end if
                     } // end if
 
+
                     // handle the case where only two objects are detected
+                    // the way the webcam is setup, the webcam will most commonly see the rightmost 2 minerals
                     else if (updatedRecognitions.size() == 2) {
-                        ;
+                        /*
+                         * I bet this could be more efficient without having to loop through the list every time,
+                         * but for simplicity and a first time case, I'm just going to go with the most easy-to-understand
+                         * code. - Abid
+                         */
+
+                        // if both the minerals detected are silver, then the gold is on the left
+                        // because that's the mineral the webcam can't see
+                        if (updatedRecognitions.get(0).getLabel().equals(LABEL_SILVER_MINERAL)
+                                && updatedRecognitions.get(1).getLabel().equals(LABEL_SILVER_MINERAL)) {
+                            goldMineralPosition = 0;
+                            telemetry.addData("Gold Mineral Position", "Left");
+                        }
+
+                        // otherwise, if it is a mixed case, then handle according to the relative position of the gold mineral
+                        else {
+                            for (Recognition recognition : updatedRecognitions) {
+                                if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                    goldMineralX = (int) recognition.getLeft();
+                                }
+                                else {
+                                    silverMineral1X = (int) recognition.getLeft();
+                                }
+                            }
+                            // if the gold mineral is to the left of the silver, then it is in the center
+                            if (goldMineralX < silverMineral1X) {
+                                goldMineralPosition = 1;
+                                telemetry.addData("Gold Mineral Position", "Center");
+                            }
+
+                            // if the gold is not on the left or the center, then it is on the right position
+                            else {
+                                goldMineralPosition = 2;
+                                telemetry.addData("Gold Mineral Position", "Right");
+                            }
+                        }
+
                     }
 
+                    // if less than two minerals were detected, record it as a bad sample, but just guess and try for the one on the right
+                    else {
+                        telemetry.addData("Less than 2 Minerals Detected, Guessing on the Right", true);
+                        goldMineralPosition = 2;
+                    }
                 } // end if
-            } // end if
-
+            } // end if statement about finding the position of the gold mineral
 
             telemetry.update();
+
+            // move and knock over the gold mineral
+            if (goldMineralPosition == 0) {
+                sampleLeft();
+            }
+            else if (goldMineralPosition == 1) {
+                sampleCenter();
+            }
+            else if (goldMineralPosition == 2) {
+                sampleRight();
+            }
+            else {
+                telemetry.addData("Gold Mineral Position Variable was Malformed, something went wrong", true);
+            }
         } // end opModeIsActive() while loop
 
-
-        // move to the gold mineral
-
-
-//        runLatchToPosition(23000);
+        if (tfod != null) {
+            tfod.shutdown();
+        }
     }
 
     public void runLatchToPosition(int targetPosition) {
@@ -211,10 +289,28 @@ public class OmniWebcamAuto extends LinearOpMode {
     }
 
     void turnClockwise(double power, double seconds) {
+        power = Math.abs(power);
+
         frontLeftDrive.setPower(power);
         backLeftDrive.setPower(power);
         frontRightDrive.setPower(power);
         backRightDrive.setPower(power);
+
+        waitForSeconds(seconds);
+
+        frontLeftDrive.setPower(0);
+        backLeftDrive.setPower(0);
+        frontRightDrive.setPower(0);
+        backRightDrive.setPower(0);
+    }
+
+    void turnCounterClockwise(double power, double seconds) {
+        power = Math.abs(power);
+
+        frontLeftDrive.setPower(-power);
+        backLeftDrive.setPower(-power);
+        frontRightDrive.setPower(-power);
+        backRightDrive.setPower(-power);
 
         waitForSeconds(seconds);
 
@@ -243,21 +339,26 @@ public class OmniWebcamAuto extends LinearOpMode {
      * Move to the left mineral
      */
     void sampleLeft() {
-
+        // Just filled with Abid's guesses from home about what the movements might be like
+        turnCounterClockwise(0.5, 0.3);
+        driveForwardForSeconds(0.5, 0.3);
     }
 
     /**
      * Move to the center mineral
      */
     void sampleCenter() {
-
+        // Just filled with Abid's guesses from home about what the movements might be like
+        driveForwardForSeconds(0.5, 0.3);
     }
 
     /**
      * Move to the right position mineral
      */
     void sampleRight() {
-
+        // Just filled with Abid's guesses from home about what the movements might be like
+        turnClockwise(0.5, 0.3);
+        driveForwardForSeconds(0.5, 0.3);
     }
 
     /**
