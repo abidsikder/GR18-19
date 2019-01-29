@@ -48,7 +48,7 @@ public class OmniWebcamAuto extends LinearOpMode {
 
     public static final int CONVERSION_FACTOR = 44000;
 
-//    private Servo liftServo = null;
+    //    private Servo liftServo = null;
     private DcMotor latch = null;
 
     private DcMotor frontLeftDrive = null;
@@ -142,6 +142,13 @@ public class OmniWebcamAuto extends LinearOpMode {
                     int goldMineralX = -1;
                     int silverMineral1X = -1;
                     int silverMineral2X = -1;
+
+                    while (runtime.seconds() < 40000) {
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData("X Coordinate", recognition.getLeft());
+                            telemetry.update();
+                        }
+                    }
 
                     if (updatedRecognitions.size() == 3) {
                         for (Recognition recognition : updatedRecognitions) {
@@ -339,8 +346,14 @@ public class OmniWebcamAuto extends LinearOpMode {
      * Move to the left mineral
      */
     void sampleLeft() {
-        // Just filled with Abid's guesses from home about what the movements might be like
-        turnCounterClockwise(0.5, 0.3);
+        // because you can only see the rightmost two, turn to the left until a gold mineral is detected
+        double goldMineralX = 0;
+        boolean goldInCenter = false;
+
+        do {
+
+        } while (!goldInCenter);
+
         driveForwardForSeconds(0.5, 0.3);
     }
 
@@ -348,7 +361,8 @@ public class OmniWebcamAuto extends LinearOpMode {
      * Move to the center mineral
      */
     void sampleCenter() {
-        // Just filled with Abid's guesses from home about what the movements might be like
+        // check whether the minerl
+
         driveForwardForSeconds(0.5, 0.3);
     }
 
@@ -356,9 +370,32 @@ public class OmniWebcamAuto extends LinearOpMode {
      * Move to the right position mineral
      */
     void sampleRight() {
-        // Just filled with Abid's guesses from home about what the movements might be like
-        turnClockwise(0.5, 0.3);
+
+
         driveForwardForSeconds(0.5, 0.3);
+    }
+
+    void turnUntilGoldInCenter(double power, double seconds, boolean clockwiseTurn) {
+        // clockwiseTurn = true = turn clockwise
+        // clockwiseTurn = false = turn counter-clockwise
+
+        power = Math.abs(power);
+
+        boolean goldInTheCenter = false;
+        double goldMineralX = 0;
+
+        if (clockwiseTurn) {
+            // turn
+            turnClockwise(power, seconds);
+
+            // check whether the gold mineral is cloes enough to the center
+        }
+        else {
+            // turn
+
+            // check whether the gold mineral is close enough to the center
+        }
+
     }
 
     /**
