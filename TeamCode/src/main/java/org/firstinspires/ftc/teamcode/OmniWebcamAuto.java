@@ -124,17 +124,19 @@ public class OmniWebcamAuto extends LinearOpMode {
              * TODO
              */
 
-            // find the position of the gold mineral
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions;
+
             if (tfod != null) {
 
                 tfod.activate();
 
-                // wait for a second once on the ground to let the recognition program settle
-                waitForSeconds(1);
+                // wait for 2 seconds once on the ground to let the recognition program settle
+                waitForSeconds(2);
 
-                // getUpdatedRecognitions() will return null if no new information is available since
-                // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                // defined earlier in a larger scope
+                updatedRecognitions = tfod.getUpdatedRecognitions();
 
                 telemetry.addData("# Object Detected", updatedRecognitions.size());
 
@@ -142,13 +144,6 @@ public class OmniWebcamAuto extends LinearOpMode {
                     int goldMineralX = -1;
                     int silverMineral1X = -1;
                     int silverMineral2X = -1;
-
-                    while (runtime.seconds() < 40000) {
-                        for (Recognition recognition : updatedRecognitions) {
-                            telemetry.addData("X Coordinate", recognition.getLeft());
-                            telemetry.update();
-                        }
-                    }
 
                     if (updatedRecognitions.size() == 3) {
                         for (Recognition recognition : updatedRecognitions) {
@@ -223,23 +218,105 @@ public class OmniWebcamAuto extends LinearOpMode {
                         goldMineralPosition = 2;
                     }
                 } // end if
-            } // end if statement about finding the position of the gold mineral
 
-            telemetry.update();
+            } // end if statement with the tfod != null
 
-            // move and knock over the gold mineral
+            double xMin = 0;
+            double xMax = 40000;
+            double tolerance = xMax/150;
+            // adjusted because of the angle at which the webcam is mounted
+            // filled in with 2E4 as a placeholder value for now
+            double targetX = 20000;
+
+            // the proportional constant for turning
+            double turnConstant = 0.3;
+
+            // move and knock over the gold mineral on the left
             if (goldMineralPosition == 0) {
-                sampleLeft();
+                // turn to the left until the mineral is within sight
+                boolean goldVisible = false;
+                while (!goldVisible) {
+                    turnCounterClockwise(0.5, 0.5);
+
+                    updatedRecognitions = tfod.getUpdatedRecognitions();
+
+                    for (Recognition recognition : updatedRecognitions) {
+                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                            goldVisible = true;
+                        }
+                    }
+                }
+
+                // turn proportionally until the mineral is at the center within the bounds of tolerance
+                boolean goldWithinBounds = false;
+                while (!goldWithinBounds) {
+                    updatedRecognitions = tfod.getUpdatedRecognitions();
+
+                    // find the gold cube's recognition object
+                        // need to instantiate so that java compiler does not throw errors
+                    Recognition goldRecognition = updatedRecognitions.get(0);
+                    for (Recognition recognition : updatedRecognitions) {
+                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                            goldRecognition = recognition;
+                        }
+                    }
+
+                    if (
+                            (goldRecognition.getLeft() < (targetX - tolerance)) ||
+                            (goldRecognition.getRight() < (targetX - tolerance))
+                        ) {
+                        goldWithinBounds = true;
+                    }
+                    else {
+                        // turns proportional to how far the left side is from the maximum allowed limits of the tolerance for the cube
+                        turnCounterClockwise(0.5, turnConstant*(goldRecognition.getLeft() - (targetX - tolerance)));
+                    }
+                }
+
+                // once lined up, move forward and knock the ball over
+                driveForwardForSeconds(0.7, 3);
             }
             else if (goldMineralPosition == 1) {
-                sampleCenter();
+                // try and knock it over on the center
+                driveForwardForSeconds(0.7, 3);
             }
             else if (goldMineralPosition == 2) {
-                sampleRight();
+                // turn proportionally until the mineral is at the center within the bounds of tolerance
+                boolean goldWithinBounds = false;
+                while (!goldWithinBounds) {
+                    updatedRecognitions = tfod.getUpdatedRecognitions();
+
+                    // find the gold cube's recognition object
+                        // need to instantiate so that java compiler does not throw errors
+                    Recognition goldRecognition = updatedRecognitions.get(0);
+                    for (Recognition recognition : updatedRecognitions) {
+                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                            goldRecognition = recognition;
+                        }
+                    }
+
+                    if (
+                            (goldRecognition.getLeft() < (targetX - tolerance)) ||
+                                    (goldRecognition.getRight() < (targetX - tolerance))
+                            ) {
+                        goldWithinBounds = true;
+                    }
+                    else {
+                        // turns proportional to how far the left side is from the maximum allowed limits of the tolerance for the cube
+                        turnClockwise(0.5, turnConstant*(goldRecognition.getLeft() - (targetX - tolerance)));
+                    }
+                }
+
+                // try and knock it over on the center
+                driveForwardForSeconds(0.7, 3);
             }
             else {
                 telemetry.addData("Gold Mineral Position Variable was Malformed, something went wrong", true);
             }
+
+            telemetry.update();
+
+            break;
         } // end opModeIsActive() while loop
 
         if (tfod != null) {
@@ -379,14 +456,25 @@ public class OmniWebcamAuto extends LinearOpMode {
         // clockwiseTurn = true = turn clockwise
         // clockwiseTurn = false = turn counter-clockwise
 
+        // set manually after measuring
+        double xMin = 0;
+        double xMax = 1000;
+
+        double targetX = 400;
+        double toleranceX = 20;
+
+        double yMin = 0;
+        double yMax = 0;
+
         power = Math.abs(power);
 
         boolean goldInTheCenter = false;
         double goldMineralX = 0;
 
         if (clockwiseTurn) {
-            // turn
+            // turn proportionally until the block is within the tolerance limit
             turnClockwise(power, seconds);
+
 
             // check whether the gold mineral is cloes enough to the center
         }
