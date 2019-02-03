@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.old;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.Range;
  * Main TeleOp OpMode
  */
 
-@TeleOp(name = "OmniTeleOp", group = "Linear Opmode")
+@TeleOp(name = "OldOmniTeleOp", group = "Linear Opmode")
 public class OmniTeleOp extends OpMode {
 
     // --------------------------------------
