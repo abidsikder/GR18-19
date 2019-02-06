@@ -31,6 +31,17 @@ public final class Constants {
     public static final float DRIVE_STICK_THRESHOLD = .6f;
     public static final float TRIGGER_THRESHOLD = .65f;
 
+    // ----- AUTO CONSTANTS
+    /**
+     * Encoder value for the latch motor to come down from the lander
+     */
+    public static final int COME_DOWN_ENCVAL = 20000;
+
+    // DETACH FROM LANDER CONSTANTS
+    public static final double DETACH_FROM_LANDER_DRIVE_POWER = .75;
+    public static final double DETACH_FROM_LANDER_BACKWARDS_SECONDS = .5;
+    public static final double DETACH_FROM_LANDER_RIGHT_SECONDS = .5;
+
     private Constants() {
     }
 

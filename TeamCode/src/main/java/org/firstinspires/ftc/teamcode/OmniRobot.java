@@ -94,6 +94,5 @@ public class OmniRobot {
         frMotor.setPower(0);
         blMotor.setPower(0);
         brMotor.setPower(0);
-
     }
 }
