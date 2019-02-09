@@ -95,4 +95,12 @@ public class OmniRobot {
         blMotor.setPower(0);
         brMotor.setPower(0);
     }
+
+    public static double applyThreshold(double d, double threshold) {
+        if (!(d >= threshold || d <= -threshold)) {
+            return 0;
+        } else {
+            return d;
+        }
+    }
 }

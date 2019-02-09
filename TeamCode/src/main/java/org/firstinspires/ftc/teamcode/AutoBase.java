@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import static org.firstinspires.ftc.teamcode.Constants.*;
 
 /**
- * Base methods for Auto op modes
+ * Base methods common to all Auto op modes
  */
 public class AutoBase {
 

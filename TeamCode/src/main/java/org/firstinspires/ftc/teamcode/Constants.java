@@ -31,16 +31,23 @@ public final class Constants {
     public static final float DRIVE_STICK_THRESHOLD = .6f;
     public static final float TRIGGER_THRESHOLD = .65f;
 
+    public static final int LATCH_ALLOWANCE = 30;
+
     // ----- AUTO CONSTANTS
     /**
      * Encoder value for the latch motor to come down from the lander
      */
-    public static final int COME_DOWN_ENCVAL = 20000;
+    public static final int COME_DOWN_ENCVAL = 22000;
 
     // DETACH FROM LANDER CONSTANTS
     public static final double DETACH_FROM_LANDER_DRIVE_POWER = .75;
-    public static final double DETACH_FROM_LANDER_BACKWARDS_SECONDS = .5;
-    public static final double DETACH_FROM_LANDER_RIGHT_SECONDS = .5;
+    public static final double DETACH_FROM_LANDER_BACKWARDS_SECONDS = .15;
+    public static final double DETACH_FROM_LANDER_RIGHT_SECONDS = .2;
+
+    // VUFORIA DETECTION CONSTANTS
+    public static final int MAX_DETECTION_ATTEMPTS = 8;
+    public static final double INITIAL_DETECTION_DELAY_SECONDS = 3;
+    public static final double DETECTION_DELAY_SECONDS = .75;
 
     private Constants() {
     }

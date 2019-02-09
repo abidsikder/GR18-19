@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import static org.firstinspires.ftc.teamcode.Constants.*;
@@ -59,7 +57,10 @@ public class GeneralTeleOp extends OpMode {
         moveNomServos();
         moveLiftServo();
 
-        moveLatch();
+        moveSpools();
+        moveNom();
+
+        moveLatchWithEncoders();
     }
 
     /**
@@ -129,20 +130,31 @@ public class GeneralTeleOp extends OpMode {
      * Use the dpad to drive with a rotated reference frame so that the latch is forward
      */
     private boolean dpadDrive() {
+
+        double pow;
+        if (gamepad1.right_trigger >= TRIGGER_THRESHOLD) {
+            pow = DRIVE_POWER_SLOW;
+        } else {
+            pow = DRIVE_POWER;
+        }
+
         if (gamepad1.dpad_up) {
-            rb.drive(0, -1, 0);
+            rb.drive(0, -pow, 0);
         } else if (gamepad1.dpad_right) {
-            rb.drive(1, 0, 0);
+            rb.drive(pow, 0, 0);
         } else if (gamepad1.dpad_down) {
-            rb.drive(0, 1, 0);
+            rb.drive(0, pow, 0);
         } else if (gamepad1.dpad_left) {
-            rb.drive(0, 1, 0);
+            rb.drive(-pow, 0, 0);
         } else {
             return false;
         }
         return true;
     }
 
+    /**
+     * Move the nom servos according to the controller input
+     */
     private void moveNomServos() {
         if (gamepad2.a) {
             rb.nomServo.setPosition(NOM_SERVO_ALMOST_DOWN);
@@ -167,6 +179,9 @@ public class GeneralTeleOp extends OpMode {
         }
     }
 
+    /**
+     * Move the lift servo according to the controller input
+     */
     private void moveLiftServo() {
         if (gamepad2.dpad_left) {
             rb.liftServo.setPosition(LIFT_SERVO_BACK);
@@ -175,6 +190,9 @@ public class GeneralTeleOp extends OpMode {
         }
     }
 
+    /**
+     * Move the latch according to the controller input
+     */
     public void moveLatch() {
         if (gamepad1.left_bumper) {
             rb.latch.setPower(-1);
@@ -182,6 +200,41 @@ public class GeneralTeleOp extends OpMode {
             rb.latch.setPower(1);
         } else {
             rb.latch.setPower(0);
+        }
+    }
+
+    /**
+     * Move the latch according to the controller input, limiting the range using encoders
+     */
+    public void moveLatchWithEncoders() {
+        double latchPosition = rb.latch.getCurrentPosition();
+        if (gamepad1.left_bumper && latchPosition >= -COME_DOWN_ENCVAL + LATCH_ALLOWANCE) {
+            rb.latch.setPower(-1);
+        } else if (gamepad1.right_bumper && latchPosition <= -LATCH_ALLOWANCE) {
+            rb.latch.setPower(1);
+        } else {
+            rb.latch.setPower(0);
+        }
+    }
+
+    /**
+     * Move the horizontal and vertical spools according to controller input
+     */
+    public void moveSpools() {
+        rb.horizontalSpool.setPower(OmniRobot.applyThreshold(gamepad2.left_stick_x, .75) * 0.5);
+        rb.verticalSpool.setPower(OmniRobot.applyThreshold(-gamepad2.right_stick_y, .75));
+    }
+
+    /**
+     * Move the intake motor according to controller input
+     */
+    public void moveNom() {
+        if (gamepad2.left_bumper) {
+            rb.nomMotor.setPower(-1);
+        } else if (gamepad2.right_bumper) {
+            rb.nomMotor.setPower(1);
+        } else {
+            rb.nomMotor.setPower(0);
         }
     }
 }

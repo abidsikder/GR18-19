@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -8,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.Constants.*;
 /**
  * Auto that just comes down from the lander and delatches
  */
+@Autonomous(name = "DelatchAuto", group = "Auto")
 public class DelatchAuto extends LinearOpMode {
 
     /**
@@ -42,7 +44,6 @@ public class DelatchAuto extends LinearOpMode {
 
         base.comeDownFromLander();
         base.detachFromLander();
-
 
     }
 
