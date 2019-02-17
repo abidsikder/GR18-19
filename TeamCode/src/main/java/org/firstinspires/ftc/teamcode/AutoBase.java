@@ -43,6 +43,7 @@ public class AutoBase {
 
     /**
      * Run the latch motor to a given encoder position
+     *
      * @param targetPosition the encoder position to which to run
      */
     public void runLatchToPosition(int targetPosition) {
@@ -80,6 +81,7 @@ public class AutoBase {
         driveForSeconds(DETACH_FROM_LANDER_BACKWARDS_SECONDS, -DETACH_FROM_LANDER_DRIVE_POWER, 0, 0);
 
         // Move right
+//        driveForSeconds(DETACH_FROM_LANDER_RIGHT_SECONDS / 2, 0, DETACH_FROM_LANDER_DRIVE_POWER /  6, 0);
         driveForSeconds(DETACH_FROM_LANDER_RIGHT_SECONDS, 0, DETACH_FROM_LANDER_DRIVE_POWER, 0);
     }
 }

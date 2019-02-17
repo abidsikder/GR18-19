@@ -10,14 +10,16 @@ public final class Constants {
     public static final double NOM_SERVO_IN = 0.75;
     public static final double NOM_SERVO_MID = 0.4;
     public static final double NOM_SERVO_ALMOST_DOWN = 0.25;
-    public static final double NOM_SERVO_DOWN = 0.19;
+    //    public static final double NOM_SERVO_DOWN = 0.19;
+    public static final double NOM_SERVO_DOWN = .18;
 
     // NOM SERVO 2 POSITIONS
     public static final double NOM_SERVO_2_DUMP = .39;
     public static final double NOM_SERVO_2_IN = 0.29;
     public static final double NOM_SERVO_2_MID = 0.61;
     public static final double NOM_SERVO_2_ALMOST_DOWN = 0.76;
-    public static final double NOM_SERVO_2_DOWN = 0.81;
+    //    public static final double NOM_SERVO_2_DOWN = 0.81;
+    public static final double NOM_SERVO_2_DOWN = 0.83;
 
     // LIFT SERVO POSITIONS
     public static final double LIFT_SERVO_FORWARD = .15;
@@ -37,7 +39,9 @@ public final class Constants {
     /**
      * Encoder value for the latch motor to come down from the lander
      */
-    public static final int COME_DOWN_ENCVAL = 22000;
+//    public static final int COME_DOWN_ENCVAL = 22000;
+    // temporary
+    public static final int COME_DOWN_ENCVAL = 23000;
 
     // DETACH FROM LANDER CONSTANTS
     public static final double DETACH_FROM_LANDER_DRIVE_POWER = .75;

@@ -58,6 +58,8 @@ public class SampleAuto extends LinearOpMode {
 
         base.comeDownFromLander();
         base.detachFromLander();
+//        base.driveForSeconds(.45, 0, 0, .25);
+//        base.driveForSeconds(.1,-.2,0,0);
         base.driveForSeconds(.1, 0, 0, .25);
 
         // Wait for a few seconds to allow detection to settle
@@ -100,10 +102,10 @@ public class SampleAuto extends LinearOpMode {
                 telemetry.update();
                 pushRight();
             } else {
-                // If nothing was detected, default to going center
-                telemetry.addData("Detection status", "Failure (default Center)");
+                // If nothing was detected, default to going left
+                telemetry.addData("Detection status", "Failure (default Left)");
                 telemetry.update();
-                pushCenter();
+                pushLeft();
             }
         } else {
             // If tfod fails to activate, default to going right
@@ -170,6 +172,7 @@ public class SampleAuto extends LinearOpMode {
                 }
             } else if (numRecognitions == 2) {
                 // If two minerals were recognized, assume that the two minerals seen are the left two
+                // EDIT: right two
                 // Get each recognition.
                 Recognition recognition1 = updatedRecognitions.get(0);
                 Recognition recognition2 = updatedRecognitions.get(1);
@@ -196,6 +199,7 @@ public class SampleAuto extends LinearOpMode {
                 // If both are gold, return null (this represents failure)
                 if (!isGold1 && !isGold2) {
                     return MineralLocation.RIGHT;
+//                    return MineralLocation.LEFT;
                 } else if (isGold1 && isGold2) {
                     return null;
                 } else {
@@ -203,14 +207,18 @@ public class SampleAuto extends LinearOpMode {
                     if (isGold1) {
                         if (recognition1.getLeft() < recognition2.getLeft()) {
                             return MineralLocation.LEFT;
+//                            return MineralLocation.CENTER;
                         } else {
                             return MineralLocation.CENTER;
+//                            return MineralLocation.RIGHT;
                         }
                     } else {
                         if (recognition2.getLeft() < recognition1.getLeft()) {
                             return MineralLocation.LEFT;
+//                            return MineralLocation.CENTER;
                         } else {
                             return MineralLocation.CENTER;
+//                            return MineralLocation.RIGHT;
                         }
                     }
                 }
