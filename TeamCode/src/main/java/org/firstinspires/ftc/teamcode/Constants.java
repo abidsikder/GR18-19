@@ -41,7 +41,7 @@ public final class Constants {
      */
 //    public static final int COME_DOWN_ENCVAL = 22000;
     // temporary
-    public static final int COME_DOWN_ENCVAL = 23000;
+    public static final int COME_DOWN_ENCVAL = 24000;
 
     // DETACH FROM LANDER CONSTANTS
     public static final double DETACH_FROM_LANDER_DRIVE_POWER = .75;

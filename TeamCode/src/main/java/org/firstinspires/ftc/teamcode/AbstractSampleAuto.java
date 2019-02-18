@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static org.firstinspires.ftc.teamcode.Constants.*;
@@ -14,8 +15,7 @@ import static org.firstinspires.ftc.teamcode.VuforiaInterop.*;
 /**
  * Auto that just comes down from the lander and delatches
  */
-@Autonomous(name = "SampleAuto", group = "Auto")
-public class SampleAuto extends LinearOpMode {
+public abstract class AbstractSampleAuto extends LinearOpMode {
 
     /**
      * Amount of time elapsed
@@ -126,6 +126,17 @@ public class SampleAuto extends LinearOpMode {
         List<Recognition> updatedRecognitions = vf.tfod.getUpdatedRecognitions();
 
         if (updatedRecognitions != null) {
+
+            if (crater()) {
+                Iterator<Recognition> iter = updatedRecognitions.iterator();
+                while (iter.hasNext()) {
+                    Recognition r = iter.next();
+                    if (r.getTop() < 0.223 * r.getLeft() - 21.82) {
+                        iter.remove();
+                    }
+                }
+            }
+
             // Get the number of recognized objects
             final int numRecognitions = updatedRecognitions.size();
             telemetry.addData("# Objects Detected", numRecognitions);
@@ -258,6 +269,8 @@ public class SampleAuto extends LinearOpMode {
         base.driveForSeconds(1, 0, .5, 0);
         // TODO
     }
+
+    public abstract boolean crater();
 }
 
 /**
