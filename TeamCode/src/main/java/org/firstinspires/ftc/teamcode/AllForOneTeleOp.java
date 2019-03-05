@@ -177,15 +177,15 @@ public class AllForOneTeleOp extends OpMode {
      * Move the nom servos according to the controller input
      */
     private void moveNomServos() {
-        if (gamepad1.b) {
+        if (gamepad1.a) {
             rb.nomServo.setPosition(NOM_SERVO_ALMOST_DOWN);
             rb.nomServo2.setPosition(NOM_SERVO_2_ALMOST_DOWN);
             nomServoAlmostDown = true;
-        } else if (gamepad1.a) {
+        } else if (gamepad1.b) {
             rb.nomServo.setPosition(NOM_SERVO_MID);
             rb.nomServo2.setPosition(NOM_SERVO_2_MID);
             nomServoAlmostDown = false;
-        } else if (gamepad1.y) {
+        } else if (gamepad1.a) {
             rb.nomServo.setPosition(NOM_SERVO_DUMP);
             rb.nomServo2.setPosition(NOM_SERVO_2_DUMP);
             nomServoAlmostDown = false;
