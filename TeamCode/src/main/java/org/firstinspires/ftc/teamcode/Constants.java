@@ -22,9 +22,11 @@ public final class Constants {
     public static final double NOM_SERVO_2_DOWN = 0.83;
 
     // LIFT SERVO POSITIONS
-    public static final double LIFT_SERVO_FORWARD = .15;
+//    public static final double LIFT_SERVO_FORWARD = .15;
+    public static final double LIFT_SERVO_FORWARD = .1;
     public static final double LIFT_SERVO_MID = 0.35;
-    public static final double LIFT_SERVO_BACK = 0.75;
+//    public static final double LIFT_SERVO_BACK = 0.75;
+    public static final double LIFT_SERVO_BACK = 0.7;
 
     // DRIVING CONSTANTS
     public static final float DRIVE_LEFT_STICK_THRESHOLD_SQUARED = .25f;
