@@ -209,27 +209,27 @@ public abstract class AbstractSampleAuto extends LinearOpMode {
                 // If neither mineral is gold, then return RIGHT, since the other mineral is the gold one
                 // If both are gold, return null (this represents failure)
                 if (!isGold1 && !isGold2) {
-                    return MineralLocation.RIGHT;
-//                    return MineralLocation.LEFT;
+//                    return MineralLocation.RIGHT;
+                    return MineralLocation.LEFT;
                 } else if (isGold1 && isGold2) {
                     return null;
                 } else {
                     // If one is gold and the other is silver, figure out if gold is to the right or left of the silver
                     if (isGold1) {
                         if (recognition1.getLeft() < recognition2.getLeft()) {
-                            return MineralLocation.LEFT;
-//                            return MineralLocation.CENTER;
-                        } else {
+//                            return MineralLocation.LEFT;
                             return MineralLocation.CENTER;
-//                            return MineralLocation.RIGHT;
+                        } else {
+//                            return MineralLocation.CENTER;
+                            return MineralLocation.RIGHT;
                         }
                     } else {
                         if (recognition2.getLeft() < recognition1.getLeft()) {
-                            return MineralLocation.LEFT;
-//                            return MineralLocation.CENTER;
-                        } else {
+//                            return MineralLocation.LEFT;
                             return MineralLocation.CENTER;
-//                            return MineralLocation.RIGHT;
+                        } else {
+//                            return MineralLocation.CENTER;
+                            return MineralLocation.RIGHT;
                         }
                     }
                 }
