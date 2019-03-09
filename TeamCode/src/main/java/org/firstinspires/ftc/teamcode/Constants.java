@@ -54,9 +54,8 @@ public final class Constants {
     public static final int MAX_DETECTION_ATTEMPTS = 8;
     public static final double INITIAL_DETECTION_DELAY_SECONDS = 3;
     public static final double DETECTION_DELAY_SECONDS = .75;
+    public static final float CONFIDENCE_THRESHOLD = .825f;
 
     private Constants() {
     }
-
-    ;
 }

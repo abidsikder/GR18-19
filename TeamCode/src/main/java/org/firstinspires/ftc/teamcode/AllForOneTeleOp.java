@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import static org.firstinspires.ftc.teamcode.Constants.*;
 
 /**
- * TeleOp mode identitical to General Tele Op, except everything is handled by just one controller.
+ * TeleOp mode identical to General Tele Op, except everything is handled by just one controller.
  *
  * Complete Controller Map:
  * Left

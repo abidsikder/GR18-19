@@ -127,11 +127,12 @@ public abstract class AbstractSampleAuto extends LinearOpMode {
 
         if (updatedRecognitions != null) {
 
-            if (crater()) {
+            // Get rid of all detections before the confidence threshold
+            {
                 Iterator<Recognition> iter = updatedRecognitions.iterator();
                 while (iter.hasNext()) {
                     Recognition r = iter.next();
-                    if (r.getTop() < 0.223 * r.getLeft() - 21.82) {
+                    if (r.getConfidence() < Constants.CONFIDENCE_THRESHOLD) {
                         iter.remove();
                     }
                 }
@@ -245,9 +246,9 @@ public abstract class AbstractSampleAuto extends LinearOpMode {
      * Drive to and displace the left mineral
      */
     private void pushLeft() {
-        base.driveForSeconds(.25,1, 0, 0);
+        base.driveForSeconds(.25, 1, 0, 0);
         base.driveForSeconds(.4, 0, .5, 0);
-        base.driveForSeconds(.25,1, 0, 0);
+        base.driveForSeconds(.25, 1, 0, 0);
         base.driveForSeconds(.6, 0, .5, 0);
         // TODO
     }
@@ -256,7 +257,7 @@ public abstract class AbstractSampleAuto extends LinearOpMode {
      * Drive to and displace the left mineral
      */
     private void pushCenter() {
-        base.driveForSeconds(.2, 1, 0, 0);
+        base.driveForSeconds(.3, 1, 0, 0);
         base.driveForSeconds(1, 0, .5, 0);
         // TODO
     }
