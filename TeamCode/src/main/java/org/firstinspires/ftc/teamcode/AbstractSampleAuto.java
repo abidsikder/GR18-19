@@ -60,7 +60,7 @@ public abstract class AbstractSampleAuto extends LinearOpMode {
         base.detachFromLander();
 //        base.driveForSeconds(.45, 0, 0, .25);
 //        base.driveForSeconds(.1,-.2,0,0);
-        base.driveForSeconds(.1, 0, 0, .25);
+        base.driveForSeconds(.075, 0, 0, .25);
 
         // Wait for a few seconds to allow detection to settle
         base.waitForSeconds(INITIAL_DETECTION_DELAY_SECONDS);
@@ -132,7 +132,7 @@ public abstract class AbstractSampleAuto extends LinearOpMode {
                 Iterator<Recognition> iter = updatedRecognitions.iterator();
                 while (iter.hasNext()) {
                     Recognition r = iter.next();
-                    if (r.getConfidence() < Constants.CONFIDENCE_THRESHOLD) {
+                    if (r.getConfidence() < Constants.CONFIDENCE_THRESHOLD && r.getLabel().equals(LABEL_GOLD_MINERAL)) {
                         iter.remove();
                     }
                 }
@@ -248,8 +248,9 @@ public abstract class AbstractSampleAuto extends LinearOpMode {
     private void pushLeft() {
         base.driveForSeconds(.25, 1, 0, 0);
         base.driveForSeconds(.4, 0, .5, 0);
-        base.driveForSeconds(.25, 1, 0, 0);
-        base.driveForSeconds(.6, 0, .5, 0);
+        base.driveForSeconds(.25, .8, 0, 0);
+//        base.driveForSeconds(.6, 0, .5, 0);
+        base.driveForSeconds(.8, 0, .5, 0);
         // TODO
     }
 
@@ -257,7 +258,8 @@ public abstract class AbstractSampleAuto extends LinearOpMode {
      * Drive to and displace the left mineral
      */
     private void pushCenter() {
-        base.driveForSeconds(.3, 1, 0, 0);
+//        base.driveForSeconds(.3, 1, 0, 0);
+        base.driveForSeconds(.25, .7, 0, 0); // TODO: less?
         base.driveForSeconds(1, 0, .5, 0);
         // TODO
     }
